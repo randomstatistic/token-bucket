@@ -44,7 +44,6 @@ There is also a threadsafe asynchronous interface to these simple buckets:
       sendHttpRequest()
     }
 
-
 Design
 ------
 
