@@ -1,7 +1,5 @@
 name := "token-bucket"
 
-version := "1.0"
-
 scalaVersion := "2.11.8"
 
 organization := "com.whitepages"
