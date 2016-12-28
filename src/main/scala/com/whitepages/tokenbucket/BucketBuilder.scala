@@ -2,7 +2,6 @@ package com.whitepages.tokenbucket
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.blocking
 
 
 // Some common implementations
@@ -34,7 +33,7 @@ class BlockingBucket(private val bucket: BucketLike with Strict) extends Bucket(
 
 class AsyncBucket(private val bucket: BucketLike with Strict with ThreadsafeRequest) extends BlockingBucket(bucket) {
   def tokenF(num: Int)(implicit ec: ExecutionContext): Future[Long] =
-    Future{ blocking { bucket.requestTokens(num) } }(ec)
+    Future{ bucket.requestTokens(num) }(ec)
 
   def rateLimitedAsync[T](num: Int)(f: => T)(implicit ec: ExecutionContext): Future[T] = {
     tokenF(num).map(_ => f )

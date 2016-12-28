@@ -1,7 +1,7 @@
 package com.whitepages.tokenbucket
 
 import java.util.concurrent.locks.ReentrantLock
-
+import scala.concurrent.blocking
 
 trait Requestable {
   def requestTokens(num: Long): Long
@@ -68,9 +68,9 @@ trait Strict extends Refillable {
         case predictableSource: PredictableTokenSource =>
           // can't sleep for "remaining" unless we're aware of SizeLimited, so just wait for the next one
           val predictedSleep = predictableSource.predictNext(1).toMillis
-          if (predictedSleep > 0) Thread.sleep(predictedSleep)
+          if (predictedSleep > 0) blocking { Thread.sleep(predictedSleep) }
         case _ =>
-          Thread.sleep(remaining)  // Um? One ms per token? What else could be done here?
+          blocking { Thread.sleep(remaining) } // Um? One ms per token? What else could be done here?
       }
       foundSoFar = foundSoFar + super.requestTokens(remaining)
     }
@@ -91,8 +91,7 @@ trait WithLock {
 trait ThreadsafeRequest extends BucketLike with WithLock {
   abstract override def requestTokens(num: Long) = {
     withLock {
-      val l = super.requestTokens(num)
-      l
+      super.requestTokens(num)
     }
   }
 }
